@@ -2,97 +2,133 @@ import React, { useState } from 'react';
 import './ValentineApp.css';
 
 export default function ValentineApp() {
-  const [noButtonPosition, setNoButtonPosition] = useState({ top: '60%', left: '40%' });
-  const [noButtonSize, setNoButtonSize] = useState(1);
-  const [yesButtonSize, setYesButtonSize] = useState(1);
+  const [noButtonPosition, setNoButtonPosition] = useState(null); // null means initial position
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [hasMovedOnce, setHasMovedOnce] = useState(false);
 
   const handleYesClick = () => {
-    // Celebrate!
-    const hearts = document.createElement('div');
-    hearts.className = 'celebration-hearts';
-    document.body.appendChild(hearts);
+    setShowCelebration(true);
+    
+    // Create confetti effect
+    createConfetti();
     
     setTimeout(() => {
-      alert("Yayyy 💖 Onelly is my Valentine!");
-    }, 300);
+      setShowCelebration(false);
+    }, 4000);
+  };
+
+  const createConfetti = () => {
+    const colors = ['#ff6b9d', '#c9184a', '#ff4d6d', '#ffa8c5', '#ff758f'];
+    const confettiCount = 50;
     
-    setTimeout(() => {
-      document.body.removeChild(hearts);
-    }, 3000);
+    for (let i = 0; i < confettiCount; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 0.5 + 's';
+      confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      document.body.appendChild(confetti);
+      
+      setTimeout(() => {
+        confetti.remove();
+      }, 4000);
+    }
   };
 
   const handleNoHover = () => {
-    // Move the NO button to a random position
-    const randomTop = Math.random() * 80 + 10; // 10% to 90%
-    const randomLeft = Math.random() * 80 + 10; // 10% to 90%
+    setHasMovedOnce(true);
+    
+    // Define safe zones to avoid content
+    let randomTop, randomLeft;
+    let attempts = 0;
+    const maxAttempts = 20;
+    
+    do {
+      randomTop = Math.random() * 80 + 10;
+      randomLeft = Math.random() * 80 + 10;
+      attempts++;
+      
+      const isInEdges = 
+        (randomTop < 15 || randomTop > 85) || 
+        (randomLeft < 20 || randomLeft > 80);
+      
+      const avoidsCenter = 
+        !(randomTop > 20 && randomTop < 80 && randomLeft > 30 && randomLeft < 70);
+      
+      if (isInEdges || avoidsCenter) {
+        break;
+      }
+    } while (attempts < maxAttempts);
     
     setNoButtonPosition({
       top: `${randomTop}%`,
       left: `${randomLeft}%`
     });
-
-    // Shrink NO button and grow YES button for extra fun
-    setNoButtonSize(prev => Math.max(prev - 0.1, 0.5));
-    setYesButtonSize(prev => Math.min(prev + 0.15, 2));
   };
 
   return (
     <div className="valentine-container">
-      {/* Floating hearts background */}
-      <div className="hearts-background">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="floating-heart"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${8 + Math.random() * 4}s`,
-              fontSize: `${20 + Math.random() * 30}px`,
-              opacity: 0.3 + Math.random() * 0.4
-            }}
-          >
-            💕
-          </div>
-        ))}
-      </div>
-
-      {/* Main content */}
-      <div className="content-wrapper">
-        <h1 className="valentine-message">
-          Onelly, will you be my Valentine? 💘
-        </h1>
-
-        <div className="buttons-container">
-          <button
-            className="yes-button"
-            onClick={handleYesClick}
-            style={{
-              transform: `scale(${yesButtonSize})`
-            }}
-          >
-            YES! 💖
+      <div className="content">
+        <h1 className="title">Onelly</h1>
+        
+        <div className="image-container">
+          <img 
+            src="https://res.cloudinary.com/dwcxwpn7q/image/upload/v1769892319/IMG-20260130-WA0041_gqtups.jpg" 
+            alt="Onelly" 
+            className="profile-image"
+          />
+        </div>
+        
+        <p className="subtitle">will you be my Valentine?</p>
+        
+        <div className="buttons-wrapper">
+          <button className="btn btn-yes" onClick={handleYesClick}>
+            Yes
           </button>
-
-          <button
-            className="no-button"
+          
+          <button 
+            className={`btn btn-no ${hasMovedOnce ? 'moved' : ''}`}
             onMouseEnter={handleNoHover}
-            style={{
-              position: 'absolute',
-              top: noButtonPosition.top,
-              left: noButtonPosition.left,
-              transform: `translate(-50%, -50%) scale(${noButtonSize})`,
-              transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
-            }}
+            style={
+              noButtonPosition 
+                ? {
+                    position: 'fixed',
+                    top: noButtonPosition.top,
+                    left: noButtonPosition.left,
+                    transform: 'translate(-50%, -50%)',
+                    transition: 'all 0.3s ease-out'
+                  }
+                : {}
+            }
           >
-            No 😢
+            No
           </button>
         </div>
-
-        <p className="hint-text">
-          (Psst... try hovering over "No" 😏)
-        </p>
       </div>
+
+      {showCelebration && (
+        <div className="celebration-overlay">
+          <div className="hearts-burst">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="heart-particle"
+                style={{
+                  '--angle': `${(360 / 12) * i}deg`,
+                  animationDelay: `${i * 0.1}s`
+                }}
+              >
+                ♥
+              </div>
+            ))}
+          </div>
+          <div className="celebration-message">
+            <div className="message-line animate-in">You made me</div>
+            <div className="message-line animate-in delay-1">the happiest!</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
