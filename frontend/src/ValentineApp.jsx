@@ -132,7 +132,7 @@ export default function ValentineApp() {
           />
         </div>
         
-        <p className="subtitle">will you be my Valentine?</p>
+        <p className="subtitle">Will you be my Valentine?</p>
         
         <div className="buttons-container">
           {/* YES button */}
