@@ -16,7 +16,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 .content {
@@ -43,31 +42,30 @@ body {
   height: 300px;
   border-radius: 0%;
   object-fit: cover;
-
 }
 
 .subtitle {
   font-family: sub;
   font-size: clamp(1.2rem, 3vw, 1.8rem);
-  /* font-style: italic; */
   font-weight: 400;
   color: #1a1a1a;
   margin-bottom: 3rem;
   letter-spacing: 0.02em;
 }
 
-.buttons-wrapper {
+.buttons-container {
   position: relative;
+  min-height: 80px;
+  width: 100%;
   display: flex;
-  gap: 2rem;
   justify-content: center;
   align-items: center;
-  min-height: 80px;
+  gap: 2rem;
 }
 
 .btn {
   padding: 1rem 3rem;
-   font-family: sub;
+  font-family: sub;
   font-size: 1rem;
   font-weight: 400;
   text-transform: uppercase;
@@ -77,7 +75,6 @@ body {
   color: #1a1a1a;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .btn:hover {
@@ -86,10 +83,17 @@ body {
 }
 
 .btn-yes {
+  position: relative;
   z-index: 10;
 }
 
+.btn-yes.locked {
+  position: fixed;
+  margin: 0;
+}
+
 .btn-no {
+  position: relative;
   z-index: 5;
 }
 
@@ -120,7 +124,6 @@ body {
 
 /* Celebration overlay */
 .celebration-overlay {
-  
   position: fixed;
   top: 0;
   left: 0;
@@ -217,16 +220,17 @@ body {
   }
 
   .profile-image {
-    width: 200px;
-    height: 200px;
+    width: 400px;
+    height: 400px;
   }
 
   .subtitle {
     margin-bottom: 3rem;
   }
 
-  .buttons-wrapper {
+  .buttons-container {
     min-height: 80px;
+    gap: 1.5rem;
   }
 
   .btn {
@@ -259,17 +263,17 @@ body {
   }
 
   .profile-image {
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    height: 300px;
   }
 
   .subtitle {
     margin-bottom: 2.5rem;
   }
 
-  .buttons-wrapper {
-    gap: 1.5rem;
+  .buttons-container {
     min-height: 80px;
+    gap: 1.5rem;
   }
 
   .btn {

@@ -1,10 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './ValentineApp.css';
 
 export default function ValentineApp() {
-  const [noButtonPosition, setNoButtonPosition] = useState(null); // null means initial position
+  const [noButtonPosition, setNoButtonPosition] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [hasMovedOnce, setHasMovedOnce] = useState(false);
+  const [yesButtonPos, setYesButtonPos] = useState(null);
+  const yesButtonRef = useRef(null);
+  const noButtonRef = useRef(null);
+
+  // Capture YES button's initial position
+  useEffect(() => {
+    if (yesButtonRef.current && !yesButtonPos) {
+      const rect = yesButtonRef.current.getBoundingClientRect();
+      setYesButtonPos({
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height
+      });
+    }
+  }, [yesButtonPos]);
+
+  // Add touch move detection for mobile
+  useEffect(() => {
+    const handleTouchMove = (e) => {
+      if (!hasMovedOnce || !noButtonRef.current) return;
+      
+      const touch = e.touches[0];
+      const noButton = noButtonRef.current;
+      const rect = noButton.getBoundingClientRect();
+      
+      // Calculate distance from touch to button center
+      const buttonCenterX = rect.left + rect.width / 2;
+      const buttonCenterY = rect.top + rect.height / 2;
+      const distance = Math.sqrt(
+        Math.pow(touch.clientX - buttonCenterX, 2) + 
+        Math.pow(touch.clientY - buttonCenterY, 2)
+      );
+      
+      // If finger is within 100px of button, move it away
+      if (distance < 100) {
+        moveNoButton();
+      }
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
+    
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [hasMovedOnce]);
 
   const handleYesClick = () => {
     setShowCelebration(true);
@@ -36,7 +82,7 @@ export default function ValentineApp() {
     }
   };
 
-  const handleNoHover = () => {
+  const moveNoButton = () => {
     setHasMovedOnce(true);
     
     // Define safe zones to avoid content
@@ -67,6 +113,12 @@ export default function ValentineApp() {
     });
   };
 
+  const handleNoInteraction = (e) => {
+    // Prevent default to avoid any click/tap behavior
+    e.preventDefault();
+    moveNoButton();
+  };
+
   return (
     <div className="valentine-container">
       <div className="content">
@@ -82,30 +134,54 @@ export default function ValentineApp() {
         
         <p className="subtitle">will you be my Valentine?</p>
         
-        <div className="buttons-wrapper">
-          <button className="btn btn-yes" onClick={handleYesClick}>
+        <div className="buttons-container">
+          {/* YES button */}
+          <button 
+            ref={yesButtonRef}
+            className={`btn btn-yes ${hasMovedOnce ? 'locked' : ''}`}
+            onClick={handleYesClick}
+            style={hasMovedOnce && yesButtonPos ? {
+              position: 'fixed',
+              top: `${yesButtonPos.top}px`,
+              left: `${yesButtonPos.left}px`,
+              width: `${yesButtonPos.width}px`,
+              height: `${yesButtonPos.height}px`
+            } : {}}
+          >
             Yes
           </button>
           
-          <button 
-            className={`btn btn-no ${hasMovedOnce ? 'moved' : ''}`}
-            onMouseEnter={handleNoHover}
-            style={
-              noButtonPosition 
-                ? {
-                    position: 'fixed',
-                    top: noButtonPosition.top,
-                    left: noButtonPosition.left,
-                    transform: 'translate(-50%, -50%)',
-                    transition: 'all 0.3s ease-out'
-                  }
-                : {}
-            }
-          >
-            No
-          </button>
+          {/* NO button */}
+          {!hasMovedOnce && (
+            <button 
+              className="btn btn-no"
+              onMouseEnter={handleNoInteraction}
+              onTouchStart={handleNoInteraction}
+            >
+              No
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Moving NO button when it's been hovered/touched */}
+      {hasMovedOnce && (
+        <button 
+          ref={noButtonRef}
+          className="btn btn-no moved"
+          onMouseEnter={moveNoButton}
+          onTouchStart={handleNoInteraction}
+          style={{
+            position: 'fixed',
+            top: noButtonPosition?.top || '50%',
+            left: noButtonPosition?.left || '50%',
+            transform: 'translate(-50%, -50%)',
+            transition: 'all 0.3s ease-out'
+          }}
+        >
+          No
+        </button>
+      )}
 
       {showCelebration && (
         <div className="celebration-overlay">
