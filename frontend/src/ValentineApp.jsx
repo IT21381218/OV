@@ -145,7 +145,12 @@ export default function ValentineApp() {
               top: `${yesButtonPos.top}px`,
               left: `${yesButtonPos.left}px`,
               width: `${yesButtonPos.width}px`,
-              height: `${yesButtonPos.height}px`
+              height: `${yesButtonPos.height}px`,
+              margin: 0,
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             } : {}}
           >
             Yes
