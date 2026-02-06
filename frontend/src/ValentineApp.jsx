@@ -122,12 +122,12 @@ export default function ValentineApp() {
   return (
     <div className="valentine-container">
       <div className="content">
-        <h1 className="title">Onelly</h1>
+        <h1 className="title">Eehanee</h1>
         
         <div className="image-container">
           <img 
-            src="https://res.cloudinary.com/dwcxwpn7q/image/upload/v1769892319/IMG-20260130-WA0041_gqtups.jpg" 
-            alt="Onelly" 
+            src="https://res.cloudinary.com/dwcxwpn7q/image/upload/v1770390118/Screenshot_20260206_003808_Instagram.jpg_c9jofs.jpg" 
+            alt="Eehanee" 
             className="profile-image"
           />
         </div>
